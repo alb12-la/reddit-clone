@@ -17,6 +17,11 @@ export class AppComponent implements OnInit {
     console.log('r.', this.redditPosts)
   }
 
+  async getPrev() {
+    this.redditPosts = await this.RedditAPiService.getPreviousPage();
+  }
 
-
+  async getNext() {
+    this.redditPosts = await this.RedditAPiService.getNextPage();
+  }
 }

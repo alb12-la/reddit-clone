@@ -1,4 +1,7 @@
 <div class="container">
+  <div class="btn btn-primary" (click)="this.getPrev()">prev</div>
+  <div class="btn btn-primary" (click)="this.getNext()">getNext</div>
+
   <ng-container *ngFor="let post of redditPosts">
     <div class="card my-3">
       <div class="card-body">
