@@ -17,8 +17,16 @@
 
     <!-- TODO FIX THIS -->
     <div class="position-relative my-3">
-        <div *ngIf="getPageCount() > 0" class="btn btn-primary " (click)="this.getPrev()">prev</div>
-        <div (click)="this.getNext()" class="btn btn-primary position-absolute" style="top:0px;right: 0px;">getNext
-        </div>
+        <!-- <div *ngIf="getPageCount() > 0" class="btn btn-primary " (click)="this.getPrev()">prev</div> -->
+        <!-- <div [routerLink]="[ getNext()]" class="btn btn-primary position-absolute" style="top:0px;right: 0px;">
+            getNext
+        </div> -->
+
+        <div *ngIf="getPrev()" class="btn btn-primary" [routerLink]="['/'+getPrev()]">{{getPrev()}}</div>
+
+        <div *ngIf="getNext()" class="btn btn-primary position-absolute" style="top:0px;right: 0px;"
+            [routerLink]="['/'+getNext()]">{{getNext()}}</div>
     </div>
+
+
 </div>

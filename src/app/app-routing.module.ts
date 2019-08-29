@@ -6,16 +6,21 @@ import { ListViewComponent } from './list-view/list-view.component'
 const routes: Routes = [
   {
     path: '',
-    component: ListViewComponent,
+    pathMatch: 'full',
+    redirectTo: '/welcome',
   },
   {
-    path: ':post',
-    component: PostViewComponent,
-  }
+    path: ':afterPath',
+    component: ListViewComponent,
+  },
+  // {
+  //   path: ':post',
+  //   component: PostViewComponent,
+  // }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

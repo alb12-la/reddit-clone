@@ -27,7 +27,8 @@ const LIMIT = '10';
 
 @Injectable()
 export class RedditApiService {
-  private after = '';
+  after = '';
+  oldAfter = '';
   private before = '';
   private count = 0;
 
@@ -48,7 +49,6 @@ export class RedditApiService {
 
     const response = await this.get(builtURL, httpParams);
     const parsed = this.parseResults(response[0]);
-    console.log('parsed', parsed);
     return (parsed);
   }
 
@@ -62,8 +62,12 @@ export class RedditApiService {
     return response;
   }
 
+  async getLastKnownPosition(afterReference: string): Promise<Post[]> {
+    return this.getListings('after', afterReference)
+  }
+
   async getListings(direction?: string, reference?: string): Promise<Post[]> {
-    console.log('CALLING GET LISTING', this.count, this.after)
+
     // URL
     const builtURL = `https://www.reddit.com/r/all/hot.json`;
     // HTTP Parameters
@@ -83,16 +87,19 @@ export class RedditApiService {
         this.count = this.count - 10;
       }
     }
-
+    console.log('********CALLING GET LISTING', this.count, this.after)
     httpParams = httpParams.set('count', String(this.count));
     console.log('params', httpParams.toString());
     const response: any = await this.get(builtURL, httpParams);
-    console.log('response', response);
-
+    if (this.after) {
+      this.oldAfter = this.after;
+    }
     this.after = response.data.after;
     this.before = response.data.before;
+    console.log('oldAfter', this.oldAfter);
     console.log('after', this.after);
     console.log('before', this.before);
+    console.log('==================================')
     return this.parseResults(response);
   }
 
@@ -100,10 +107,10 @@ export class RedditApiService {
     const posts: any[] = redditResponse.data.children;
     const allPosts: Post[] = [];
     // Parse Posts
-    console.group('response');
+
     posts.forEach((post) => {
       const data = post.data;
-      console.log(data.title, '=>', data.id);
+      console.log(data.id)
       const newPost = new Post(
         data.id,
         data.permalink,
@@ -115,7 +122,7 @@ export class RedditApiService {
       );
       allPosts.push(newPost);
     });
-    console.groupEnd();
+
     return allPosts;
   }
 
