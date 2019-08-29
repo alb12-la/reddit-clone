@@ -1,7 +1,4 @@
 <div class="container">
-  <div class="btn btn-primary" (click)="this.getPrev()">prev</div>
-  <div class="btn btn-primary" (click)="this.getNext()">getNext</div>
-
   <ng-container *ngFor="let post of redditPosts">
     <div class="card my-3">
       <div class="card-body">
@@ -15,8 +12,14 @@
       <img src="{{post.previewImage}}" class="card-img-top"
         style="max-height:512px;max-width:600px;height:auto;width:auto;margin:auto" alt="...">
     </div>
-
   </ng-container>
+
+
+  <!-- TODO FIX THIS -->
+  <div class="position-relative my-3">
+    <div *ngIf="getPageCount() > 0" class="btn btn-primary " (click)="this.getPrev()">prev</div>
+    <div (click)="this.getNext()" class="btn btn-primary position-absolute" style="top:0px;right: 0px;">getNext</div>
+  </div>
 
 
 </div>

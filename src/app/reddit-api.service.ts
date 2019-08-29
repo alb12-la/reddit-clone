@@ -27,13 +27,18 @@ const LIMIT = '10';
 
 @Injectable()
 export class RedditApiService {
-  after = '';
-  before = '';
-  count = 0;
+  private after = '';
+  private before = '';
+  private count = 0;
 
   constructor(
     private http: HttpClient,
   ) { }
+
+  getCount() {
+    return this.count;
+  }
+
 
   async getNextPage(): Promise<Post[]> {
     const response = this.getListings('after', this.after);

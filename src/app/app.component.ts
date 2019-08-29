@@ -24,4 +24,8 @@ export class AppComponent implements OnInit {
   async getNext() {
     this.redditPosts = await this.RedditAPiService.getNextPage();
   }
+
+  getPageCount() {
+    return this.RedditAPiService.getCount();
+  }
 }
