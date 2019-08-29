@@ -7,7 +7,14 @@ export class Page {
     public before: string,
     public after: string,
   ) { }
+}
 
+export class Comment {
+  constructor(
+    public author: string,
+    public body: string,
+    public replies?: Comment[],
+  ) { }
 }
 
 export class Post {
@@ -18,7 +25,8 @@ export class Post {
     public authorName: string,
     public previewImage: string,
     public title: string,
-    public media: any
+    public media: any,
+    public comments?: Comment[]
   ) { }
 }
 
@@ -39,7 +47,7 @@ export class RedditApiService {
     return this.count;
   }
 
-  async getPost(postId: string) {
+  async getPost(postId: string): Promise<Post> {
     const builtURL = `https://www.reddit.com/comments/${postId}/.json`;
     // HTTP Parameters
     let httpParams = new HttpParams();
@@ -47,8 +55,10 @@ export class RedditApiService {
     httpParams = httpParams.set('raw_json', '1');
 
     const response = await this.get(builtURL, httpParams);
-    const parsed = this.parseResults(response[0]);
-    console.log('parsed', parsed);
+
+    const parsed = this.parseResults(response[0])[0];
+    parsed.comments = this.parseComments(response[1]);
+
     return (parsed);
   }
 
@@ -119,8 +129,18 @@ export class RedditApiService {
     return allPosts;
   }
 
-  parsePostObject(redditResponse: any) {
-    console.log(redditResponse);
+  parseComments(redditResponse: any): Comment[] {
+    const posts: any[] = redditResponse.data.children;
+    const allComments: Comment[] = [];
+    // Parse Posts
+
+    posts.forEach((post) => {
+      const data = post.data;
+      const newComment = new Comment(data.id, data.body_html);
+      allComments.push(newComment);
+    });
+
+    return allComments;
   }
 
   extractPreviewImages(data) {

@@ -7,21 +7,34 @@ import { RedditApiService, Post } from '../reddit-api.service';
 export class ListViewComponent implements OnInit {
 
   redditPosts: Post[];
+  selectedPost: string;
+
   constructor(
     private RedditAPiService: RedditApiService,
   ) { }
 
   async ngOnInit() {
     this.redditPosts = await this.RedditAPiService.getListings();
-    console.log('r.', this.redditPosts)
+  }
+
+  selectPost(post: string) {
+    this.selectedPost = post;
   }
 
   async getPrev() {
-    this.redditPosts = await this.RedditAPiService.getPreviousPage();
+    const posts = await this.RedditAPiService.getPreviousPage();
+    window.scrollTo(0, 0);
+    this.redditPosts = posts;
+  }
+
+  clearSelectedPost() {
+    this.selectedPost = null;
   }
 
   async getNext() {
-    this.redditPosts = await this.RedditAPiService.getNextPage();
+    const posts = await this.RedditAPiService.getNextPage();
+    window.scrollTo(0, 0);
+    this.redditPosts = posts;
   }
 
   getPageCount() {

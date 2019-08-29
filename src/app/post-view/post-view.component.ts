@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { RedditApiService, Post } from '../reddit-api.service';
@@ -7,16 +7,16 @@ import { RedditApiService, Post } from '../reddit-api.service';
   selector: 'app-post-view',
   templateUrl: './post-view.component.html'
 })
-export class PostViewComponent implements OnInit {
-  posts: Post[];
+export class PostViewComponent implements OnChanges {
+  @Input() selectedPost: string;
+  post: Post;
   constructor(
     private RedditAPiService: RedditApiService,
     private route: ActivatedRoute,
   ) { }
 
-  async ngOnInit() {
-    const postID = this.route.snapshot.params['post'];
-    this.posts = await this.RedditAPiService.getPost(postID);
+  async ngOnChanges() {
+    this.post = await this.RedditAPiService.getPost(this.selectedPost);
   }
 
 }
