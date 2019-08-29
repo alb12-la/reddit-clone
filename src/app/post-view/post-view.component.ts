@@ -1,7 +1,7 @@
 import { Component, OnChanges, Input } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 
-import { RedditApiService, Post } from '../reddit-api.service';
+import { RedditApiService } from '../reddit-api.service';
+import { Post } from '../shared-classes';
 
 @Component({
   selector: 'app-post-view',
@@ -10,9 +10,9 @@ import { RedditApiService, Post } from '../reddit-api.service';
 export class PostViewComponent implements OnChanges {
   @Input() selectedPost: string;
   post: Post;
+
   constructor(
     private RedditAPiService: RedditApiService,
-    private route: ActivatedRoute,
   ) { }
 
   async ngOnChanges() {

@@ -1,5 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { RedditApiService, Post } from '../reddit-api.service';
+import { Component, OnInit } from '@angular/core';
+import { RedditApiService } from '../reddit-api.service';
+import { Post } from '../shared-classes';
+
 @Component({
   selector: 'app-list-view',
   templateUrl: './list-view.component.html'

@@ -1,34 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, } from '@angular/common/http';
 
-export class Page {
-  constructor(
-    public posts: Post[],
-    public before: string,
-    public after: string,
-  ) { }
-}
+import { Post, Comment } from './shared-classes';
 
-export class Comment {
-  constructor(
-    public author: string,
-    public body: string,
-    public replies?: Comment[],
-  ) { }
-}
-
-export class Post {
-  constructor(
-    public id: string,
-    public permalink: string,
-    public subReddit: string,
-    public authorName: string,
-    public previewImage: string,
-    public title: string,
-    public comments?: Comment[]
-  ) { }
-}
-
+// CONSTS
 const LIMIT_KEY = 'limit';
 const LIMIT = '10';
 const RAW_JSON_KEY = 'raw_json';
@@ -58,7 +33,7 @@ export class RedditApiService {
     let httpParams = new HttpParams();
     httpParams = httpParams.set(LIMIT_KEY, LIMIT);
     httpParams = httpParams.set(RAW_JSON_KEY, RAW_JSON_VALUE);
-    // Get response 
+    // Get response
     const response = await this.get(builtURL, httpParams);
     // Parse response to get a Post object
     const parsed = this.parseResults(response[0])[0];
