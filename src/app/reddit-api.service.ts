@@ -39,6 +39,18 @@ export class RedditApiService {
     return this.count;
   }
 
+  async getPost(postId: string) {
+    const builtURL = `https://www.reddit.com/comments/${postId}/.json`;
+    // HTTP Parameters
+    let httpParams = new HttpParams();
+    httpParams = httpParams.set(LIMIT_KEY, LIMIT);
+    httpParams = httpParams.set('raw_json', '1');
+
+    const response = await this.get(builtURL, httpParams);
+    const parsed = this.parseResults(response[0]);
+    console.log('parsed', parsed);
+    return (parsed);
+  }
 
   async getNextPage(): Promise<Post[]> {
     const response = this.getListings('after', this.after);
@@ -51,6 +63,7 @@ export class RedditApiService {
   }
 
   async getListings(direction?: string, reference?: string): Promise<Post[]> {
+    console.log('CALLING GET LISTING', this.count, this.after)
     // URL
     const builtURL = `https://www.reddit.com/r/all/hot.json`;
     // HTTP Parameters
@@ -104,6 +117,10 @@ export class RedditApiService {
     });
     console.groupEnd();
     return allPosts;
+  }
+
+  parsePostObject(redditResponse: any) {
+    console.log(redditResponse);
   }
 
   extractPreviewImages(data) {

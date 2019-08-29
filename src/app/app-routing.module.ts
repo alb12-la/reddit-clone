@@ -7,7 +7,10 @@ const routes: Routes = [
   {
     path: '',
     component: ListViewComponent,
-
+  },
+  {
+    path: ':post',
+    component: PostViewComponent,
   }
 ];
 
