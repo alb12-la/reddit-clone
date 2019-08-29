@@ -6,11 +6,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { RedditApiService } from './reddit-api.service';
 import { PostViewComponent } from './post-view/post-view.component';
+import { ListViewComponent } from './list-view/list-view.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PostViewComponent
+    PostViewComponent,
+    ListViewComponent
   ],
   imports: [
     BrowserModule,
