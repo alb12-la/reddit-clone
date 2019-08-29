@@ -1,33 +1,38 @@
 <div class="container">
-
+    <!-- Not routing, but gets the job done :) -->
     <div *ngIf="selectedPost">
-        <div class="text-right my-3" (click)="clearSelectedPost()"><i class="fas fa-times"></i> </div>
+        <div class="text-left my-3" (click)="clearSelectedPost()"><i class="fas fa-arrow-left"></i> </div>
         <app-post-view [selectedPost]="selectedPost"></app-post-view>
     </div>
 
     <div [ngClass]="selectedPost ? 'd-none' : ''">
-        <ng-container *ngFor="let post of redditPosts">
-            <div class="card my-3  bg-dark text-white" (click)="selectPost(post.id)">
-                <div class="card-body">
-                    <div class="d-flex flex-row mb-3 ">
-                        <span class="font-weight-bold mr-2">r/{{post.subReddit}}</span>
-                        <span class="text-muted ml-2">posted by u/{{post.authorName}}</span>
+        <div *ngIf="redditPosts else loading">
+            <ng-container *ngFor="let post of redditPosts">
+                <div class="card my-3  bg-dark text-white" (click)="selectPost(post.id)">
+                    <div class="card-body">
+                        <div class="d-flex flex-row mb-3 ">
+                            <span class="font-weight-bold mr-2">r/{{post.subReddit}}</span>
+                            <span class="text-muted ml-2">posted by u/{{post.authorName}}</span>
+                        </div>
+                        <h5 class="card-title">{{post.title}}</h5>
+
                     </div>
-                    <h5 class="card-title">{{post.title}}</h5>
-
+                    <img src="{{post.previewImage}}" class="card-img-top" alt="...">
                 </div>
-                <img src="{{post.previewImage}}" class="card-img-top"
-                    style="max-height:512px;max-width:600px;height:auto;width:auto;margin:auto" alt="...">
-            </div>
-        </ng-container>
+            </ng-container>
 
 
-        <!-- TODO FIX THIS -->
-        <div class="position-relative my-3">
-            <div *ngIf="getPageCount() > 0" class="btn btn-dark " (click)="this.getPrev()">Previous</div>
-            <div (click)="this.getNext()" class="btn btn-dark position-absolute" style="top:0px;right: 0px;">Next
+            <div class="position-relative my-3">
+                <div *ngIf="getPageCount() > 0" class="btn btn-dark " (click)="this.getPrev()">Previous</div>
+                <div (click)="this.getNext()" class="btn btn-dark position-absolute" style="top:0px;right: 0px;">Next
+                </div>
             </div>
         </div>
 
+        <ng-template #loading>
+            <div class="text-white position-relative" style="height: 300px;">
+                <i class="fas large-font fa-spinner fa-spin position-absolute" style="top:50%; left: 50%;"></i>
+            </div>
+        </ng-template>
     </div>
 </div>

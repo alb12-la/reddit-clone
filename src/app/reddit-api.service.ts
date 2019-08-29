@@ -25,13 +25,14 @@ export class Post {
     public authorName: string,
     public previewImage: string,
     public title: string,
-    public media: any,
     public comments?: Comment[]
   ) { }
 }
 
 const LIMIT_KEY = 'limit';
 const LIMIT = '10';
+const RAW_JSON_KEY = 'raw_json';
+const RAW_JSON_VALUE = '1';
 
 @Injectable()
 export class RedditApiService {
@@ -47,45 +48,57 @@ export class RedditApiService {
     return this.count;
   }
 
+  /**
+   * Returns a Reddit Post(t3) object for a given postId
+   * @param postId https://www.reddit.com/dev/api/#fullnames
+   */
   async getPost(postId: string): Promise<Post> {
     const builtURL = `https://www.reddit.com/comments/${postId}/.json`;
-    // HTTP Parameters
+    // Set HTTP Parameters
     let httpParams = new HttpParams();
     httpParams = httpParams.set(LIMIT_KEY, LIMIT);
-    httpParams = httpParams.set('raw_json', '1');
-
+    httpParams = httpParams.set(RAW_JSON_KEY, RAW_JSON_VALUE);
+    // Get response 
     const response = await this.get(builtURL, httpParams);
-
+    // Parse response to get a Post object
     const parsed = this.parseResults(response[0])[0];
+    // Parse comments separately
     parsed.comments = this.parseComments(response[1]);
-
-    return (parsed);
+    return parsed;
   }
 
+  /**
+   * Returns an array of Posts, that starts after the AFTER reference
+   */
   async getNextPage(): Promise<Post[]> {
     const response = this.getListings('after', this.after);
     return response;
   }
 
+  /**
+   * Returns an array of Posts, that starts at ( BEFORE reference - COUNT)
+   */
   async getPreviousPage(): Promise<Post[]> {
     const response = this.getListings('before', this.before);
     return response;
   }
 
+  /**
+   * Returns an array of Posts
+   * @param direction Either Before || After, depending on which direction we intend to paginate
+   * @param reference the "anchor point" of the data slice https://www.reddit.com/dev/api/#listings
+   */
   async getListings(direction?: string, reference?: string): Promise<Post[]> {
-    console.log('CALLING GET LISTING', this.count, this.after)
     // URL
     const builtURL = `https://www.reddit.com/r/all/hot.json`;
     // HTTP Parameters
     let httpParams = new HttpParams();
     httpParams = httpParams.set(LIMIT_KEY, LIMIT);
-    httpParams = httpParams.set('raw_json', '1');
+    httpParams = httpParams.set(RAW_JSON_KEY, RAW_JSON_VALUE);
 
     // Add direction if provided
     if (direction) {
-      console.log('load', direction, reference);
       httpParams = httpParams.set(direction, reference);
-
       // update count
       if (direction === 'after') {
         this.count = this.count + 10;
@@ -93,49 +106,59 @@ export class RedditApiService {
         this.count = this.count - 10;
       }
     }
-
     httpParams = httpParams.set('count', String(this.count));
-    console.log('params', httpParams.toString());
-    const response: any = await this.get(builtURL, httpParams);
-    console.log('response', response);
 
+    const response: any = await this.get(builtURL, httpParams);
+    // Update anchor points
     this.after = response.data.after;
     this.before = response.data.before;
-    console.log('after', this.after);
-    console.log('before', this.before);
+    // Parse results into Posts
     return this.parseResults(response);
   }
 
+  /**
+   * Converts Raw JSON into Post Objects
+   * @param redditResponse : Raw json provided by Reddit
+   */
   parseResults(redditResponse: any): Post[] {
     const posts: any[] = redditResponse.data.children;
     const allPosts: Post[] = [];
+
     // Parse Posts
-    console.group('response');
     posts.forEach((post) => {
       const data = post.data;
-      console.log(data.title, '=>', data.id);
+      // Lets not get fired from a job I don't have yet
+      if (data.over_18) {
+        return;
+      }
+      // Create a Post Object
       const newPost = new Post(
         data.id,
         data.permalink,
         data.subreddit,
         data.author,
         this.extractPreviewImages(data),
-        data.title,
-        data['secure_media']
+        data.title
       );
+      // Push to list of posts
       allPosts.push(newPost);
     });
     console.groupEnd();
     return allPosts;
   }
 
+  /**
+   * Converts Raw JSON into Comment Objects
+   * @param redditResponse :  Raw json provided by Reddit
+   */
   parseComments(redditResponse: any): Comment[] {
     const posts: any[] = redditResponse.data.children;
     const allComments: Comment[] = [];
-    // Parse Posts
 
+    // Parse Posts
     posts.forEach((post) => {
       const data = post.data;
+      // TODO: We should recurse and collect replies to this comment.
       const newComment = new Comment(data.id, data.body_html);
       allComments.push(newComment);
     });
@@ -143,6 +166,7 @@ export class RedditApiService {
     return allComments;
   }
 
+  // Hacky way of safely traversing through unknown object. 
   extractPreviewImages(data) {
     if (data &&
       data.preview &&
@@ -154,19 +178,20 @@ export class RedditApiService {
     } else {
       return '';
     }
-
   }
 
 
-  // TODO: Use proper try catch techniques.
-  get(getUrl: string, httpParameters?: HttpParams): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.http.get(getUrl, { params: httpParameters }).subscribe((response: any) => {
+  /**
+   * Converts a `GET` request into a Promise that the caller can then await for
+   */
+  async get(getUrl: string, httpParameters?: HttpParams): Promise<object> {
+    return new Promise<object>((resolve, reject) => {
+      this.http.get(getUrl, { params: httpParameters }).subscribe((response: object) => {
         resolve(response);
       }, reject);
+    }).catch((error) => {
+      throw new Error(`ERROR: Unable to retrieve data from ${getUrl} due to ${error}`);
     });
   }
-
-
 }
 

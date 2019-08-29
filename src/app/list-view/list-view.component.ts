@@ -22,9 +22,10 @@ export class ListViewComponent implements OnInit {
   }
 
   async getPrev() {
-    const posts = await this.RedditAPiService.getPreviousPage();
+    // Set value to falsy so that loading screen appears
+    this.redditPosts = null;
     window.scrollTo(0, 0);
-    this.redditPosts = posts;
+    this.redditPosts = await this.RedditAPiService.getPreviousPage();
   }
 
   clearSelectedPost() {
@@ -32,9 +33,11 @@ export class ListViewComponent implements OnInit {
   }
 
   async getNext() {
-    const posts = await this.RedditAPiService.getNextPage();
+    // Set value to falsy so that loading screen appears
+    this.redditPosts = null;
     window.scrollTo(0, 0);
-    this.redditPosts = posts;
+    this.redditPosts = await this.RedditAPiService.getNextPage();
+
   }
 
   getPageCount() {
